@@ -1,5 +1,5 @@
 import textwrap
-from abc import ABC, abstractclassmethod, abstractproperty
+from abc import ABC, abstractmethod
 from datetime import datetime
 
 
@@ -109,7 +109,7 @@ class ContaCorrente(Conta):
         return False
 
     def __str__(self):
-        return f"""\
+        return f"""\ 
             Agência:\t{self.agencia}
             C/C:\t\t{self.numero}
             Titular:\t{self.cliente.nome}
@@ -129,18 +129,18 @@ class Historico:
             {
                 "tipo": transacao.__class__.__name__,
                 "valor": transacao.valor,
-                "data": datetime.now().strftime("%d-%m-%Y %H:%M:%s"),
+                "data": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             }
         )
 
 
 class Transacao(ABC):
     @property
-    @abstractproperty
+    @abstractmethod
     def valor(self):
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def registrar(self, conta):
         pass
 
@@ -199,8 +199,15 @@ def recuperar_conta_cliente(cliente):
         print("\n@@@ Cliente não possui conta! @@@")
         return
 
-    # FIXME: não permite cliente escolher a conta
-    return cliente.contas[0]
+    if len(cliente.contas) == 1:
+        return cliente.contas[0]
+
+    print("\nContas disponíveis:")
+    for i, conta in enumerate(cliente.contas):
+        print(f"[{i}] Conta {conta.numero} - Agência {conta.agencia}")
+
+    indice = int(input("Escolha o número da conta: "))
+    return cliente.contas[indice]
 
 
 def depositar(clientes):
@@ -259,7 +266,7 @@ def exibir_extrato(clientes):
         extrato = "Não foram realizadas movimentações."
     else:
         for transacao in transacoes:
-            extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f}"
+            extrato += f"\n{transacao['data']} - {transacao['tipo']}:\n\tR$ {transacao['valor']:.2f}"
 
     print(extrato)
     print(f"\nSaldo:\n\tR$ {conta.saldo:.2f}")
@@ -326,17 +333,20 @@ def main():
             criar_cliente(clientes)
 
         elif opcao == "nc":
-            numero_conta = len(contas) + 1
+            numero_conta = input("Informe o número da conta: ")
             criar_conta(numero_conta, clientes, contas)
-
         elif opcao == "lc":
+            
             listar_contas(contas)
-
         elif opcao == "q":
+            print("\n=== Volte sempre! ===")
             break
-
         else:
             print("\n@@@ Operação inválida, por favor selecione novamente a operação desejada. @@@")
+            
+if __name__ == "__main__":
+    main()  
 
 
-main()
+
+# desafio banco atualizado utilizando POO
