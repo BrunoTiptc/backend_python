@@ -55,34 +55,46 @@ class Conta:
     def historico(self):
         return self._historico
 
-    def sacar(self, valor):
-        saldo = self.saldo
-        excedeu_saldo = valor > saldo
-
-        if excedeu_saldo:
-            print("\n@@@ Operação falhou! Você não tem saldo suficiente. @@@")
-
-        elif valor > 0:
-            self._saldo -= valor
-            print("\n=== Saque realizado com sucesso! ===")
-            return True
-
-        else:
-            print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
-
+def sacar(self, valor):
+    if not self.pode_realizar_transacao():
         return False
 
-    def depositar(self, valor):
-        if valor > 0:
-            self._saldo += valor
-            print("\n=== Depósito realizado com sucesso! ===")
-        else:
-            print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
-            return False
+    saldo = self.saldo
+    excedeu_saldo = valor > saldo
 
+    if excedeu_saldo:
+        print("\n@@@ Operação falhou! Você não tem saldo suficiente. @@@")
+    elif valor > 0:
+        self._saldo -= valor
+        print("\n=== Saque realizado com sucesso! ===")
         return True
+    else:
+        print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
+    return False
 
+def depositar(self, valor):
+    if not self.pode_realizar_transacao():
+        return False
 
+    if valor > 0:
+        self._saldo += valor
+        print("\n=== Depósito realizado com sucesso! ===")
+    else:
+        print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
+        return False
+    return True
+
+def pode_realizar_transacao(self):
+    """Verifica se a conta já atingiu o limite diário de 10 transações."""
+    hoje = datetime.now().date()
+    transacoes_hoje = [
+        t for t in self.historico.transacoes
+        if datetime.strptime(t["data"], "%d-%m-%Y %H:%M:%S").date() == hoje
+    ]
+    if len(transacoes_hoje) >= 10:
+        print("\n@@@ Operação falhou! Você excedeu o número de transações permitidas para hoje. @@@")
+        return False
+    return True
 class ContaCorrente(Conta):
     def __init__(self, numero, cliente, limite=500, limite_saques=3):
         super().__init__(numero, cliente)
